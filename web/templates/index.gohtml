@@ -1,0 +1,39 @@
+{{define "content"}}
+<div class="container">
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Tasks
+        </h1>
+      </div>
+    </div>
+  </section>
+  <div class="block is-flex is-justify-content-flex-end p-4">
+    <a href="/new" class="button is-primary" >
+      <span class="icon">
+        <i class="gg-add"></i>
+      </span>
+      <span>Add</span>
+    </a>
+  </div>
+  <div class="block" id="tasks">
+  <div class="columns is-multiline">
+  {{range $i , $task := .Tasks}}
+  <div class="column is-one-third">
+  <div class="card">
+    <div class="card-content">
+      <p class="title">{{$task.title}}</p>
+      <p>{{$task.details}}</p>
+    </div>
+    <footer class="card-footer"> 
+      <a href="/edit/{{$task.id}}" class="card-footer-item">Edit</a>
+      <a href="/delete/{{$task.id}}" class="card-footer-item">Delete</a>
+    </footer>
+  </div>
+  </div>
+  {{end}}
+  </div>
+  </div>
+</div>
+{{end}}
