@@ -8,12 +8,12 @@ import (
 	"net/http"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(initTasks bool) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", taskListPage())
 
-	th := NewTasksHandler()
+	th := NewTasksHandler(initTasks)
 	mux.HandleFunc("/new", th.taskCreatePage())
 	mux.Handle("/view/", http.StripPrefix("/view", http.HandlerFunc(th.taskViewPage())))
 	mux.Handle("/edit/", http.StripPrefix("/edit", http.HandlerFunc(th.taskEditPage())))

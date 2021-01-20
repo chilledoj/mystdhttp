@@ -7,3 +7,6 @@ build:
 
 run: build
 	./bin/mystdhttp
+
+run-empty: build
+	./bin/mystdhttp -init-tasks=false

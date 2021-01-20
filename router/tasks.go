@@ -110,11 +110,13 @@ Task %d details
 	}
 }
 
-func NewTasksHandler() *TasksHandler {
+func NewTasksHandler(initTasks bool) *TasksHandler {
 	th := &TasksHandler{
 		data: make(map[string]Task),
 	}
-	th.initData()
+	if initTasks {
+		th.initData()
+	}
 	return th
 }
 
