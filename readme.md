@@ -2,6 +2,6 @@
 
 A basic website built with just the go standard library.
 
-# Running
+## Running
 
 Use the `makefile` and run `make run`.

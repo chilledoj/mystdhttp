@@ -13,20 +13,16 @@ func NewRouter() http.Handler {
 
 	mux.HandleFunc("/", taskListPage())
 
-	return mux
-}
+	th := NewTasksHandler()
+	mux.HandleFunc("/new", th.taskCreatePage())
+	mux.Handle("/view/", http.StripPrefix("/view", http.HandlerFunc(th.taskViewPage())))
+	mux.Handle("/edit/", http.StripPrefix("/edit", http.HandlerFunc(th.taskEditPage())))
 
-var tasks = []map[string]string{
-	{"id": "task-01", "title": "test", "details": "a test task", "status": "active"},
-	{"id": "task-02", "title": "Another Test", "details": "# Title\n\n+ Some Stuff to do\n+ Another item\n\nSomething else written here", "status": "active"},
-	{"id": "task-03", "title": "Test 3", "details": "a test task 3", "status": "active"},
-	{"id": "task-04", "title": "Test 4", "details": "a test task 4", "status": "active"},
-	{"id": "task-05", "title": "Test 5", "details": "a test task 5", "status": "active"},
-	{"id": "task-06", "title": "Test 6", "details": "a test task 6", "status": "pending"},
-	{"id": "task-07", "title": "Test 7", "details": "a test task 7", "status": "pending"},
-	{"id": "task-08", "title": "Test 8", "details": "a test task 8", "status": "active"},
-	{"id": "task-09", "title": "Test 9", "details": "a test task 9", "status": "inactive"},
-	{"id": "task-10", "title": "Test 10", "details": "a test task 10", "status": "inactive"},
+	mux.Handle("/api/tasks/", http.StripPrefix("/api/tasks", th))
+	mux.HandleFunc("/api/comments", th.addComment)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
+
+	return mux
 }
 
 func taskListPage() http.HandlerFunc {
@@ -38,11 +34,10 @@ func taskListPage() http.HandlerFunc {
 			return
 		}
 		var buf bytes.Buffer
-		if err := tmpl.ExecuteTemplate(&buf, "base", map[string]interface{}{
-			"Tasks": tasks,
-		}); err != nil {
+		if err := tmpl.ExecuteTemplate(&buf, "base", nil); err != nil {
 			fmt.Printf("ERR: %v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusOK)
 		io.Copy(w, &buf)
@@ -58,6 +53,7 @@ var notFoundPage = func() http.HandlerFunc {
 		if err := tmpl.ExecuteTemplate(&buf, "base", nil); err != nil {
 			fmt.Printf("ERR: %v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusOK)
 		io.Copy(w, &buf)

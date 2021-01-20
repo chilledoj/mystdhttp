@@ -1,6 +1,9 @@
 package router
 
-import "html/template"
+import (
+	"html/template"
+	"time"
+)
 
 var defaultFuncs = template.FuncMap{
 	"defTitle": func(ip interface{}) string {
@@ -10,9 +13,13 @@ var defaultFuncs = template.FuncMap{
 		}
 		return v
 	},
+	"dtestr": func(ip time.Time, fmt string) string {
+		return ip.Format(fmt)
+	},
 }
 var templateFiles = []string{
 	"./web/templates/base.gohtml",
+	"./web/templates/statusTag.gohtml",
 }
 
 func tmplLayout(files ...string) []string {

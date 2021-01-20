@@ -17,23 +17,33 @@
       <span>Add</span>
     </a>
   </div>
-  <div class="block" id="tasks">
-  <div class="columns is-multiline">
-  {{range $i , $task := .Tasks}}
-  <div class="column is-one-third">
-  <div class="card">
-    <div class="card-content">
-      <p class="title">{{$task.title}}</p>
-      <p>{{$task.details}}</p>
+  <div class="block" >
+  <div class="columns is-multiline" id="tasks">
+    {{/* This is merely a loading placeholder and will be replaced by the results of a javascript fetch */}}
+    <div class="column is-one-third">
+    <div class="card">
+      <div class="card-content">
+        <progress class="progress is-small is-primary" max="100">15%</progress>
+      </div>
+
     </div>
-    <footer class="card-footer"> 
-      <a href="/edit/{{$task.id}}" class="card-footer-item">Edit</a>
-      <a href="/delete/{{$task.id}}" class="card-footer-item">Delete</a>
+    </div>
+
+  </div>
+  </div>
+  <div class="modal" id="deleteModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Delete Task</p>
+      <button class="delete" aria-label="close" data-close></button>
+    </header>
+    <section class="modal-card-body" id="deleteModalBody"></section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" data-delete="true">Delete</button>
+      <button class="button" aria-label="close">Cancel</button>
     </footer>
   </div>
-  </div>
-  {{end}}
-  </div>
-  </div>
 </div>
+<script src="/static/js/tasks.js"></script>
 {{end}}
