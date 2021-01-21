@@ -1,0 +1,11 @@
+{{define "statusTag"}}
+  {{if eq . "inactive" }}
+    <span class="tag is-light">{{.}}</span>
+  {{else if eq . "started"}}
+  <span class="tag is-info">{{.}}</span>
+  {{else if eq . "completed"}}
+    <span class="tag is-success">{{.}}</span>
+  {{else}}
+    <span class="tag is-primary">{{.}}</span>
+  {{end}}
+{{end}}

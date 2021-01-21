@@ -1,18 +1,28 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/chilledoj/mystdhttp/router"
 )
 
-func runHttp(listenAddr string) error {
+type options struct {
+	lg         *log.Logger
+	listenAddr string
+	initTasks  bool
+}
+
+func runHttp(opts options) error {
 	s := http.Server{
-		Addr:    listenAddr,
-		Handler: router.NewRouter(),
+		Addr:           opts.listenAddr,
+		Handler:        router.NewRouter(opts.lg, opts.initTasks),
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
-	fmt.Printf("Starting HTTP listener at %s\n", listenAddr)
+	opts.lg.Printf("Starting HTTP listener at %s\n", opts.listenAddr)
 	return s.ListenAndServe()
 }

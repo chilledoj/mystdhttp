@@ -1,0 +1,60 @@
+{{define "content"}}
+<div class="container">
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          {{if eq .FormType "new"}}Create{{else}}Edit{{end}} Task
+        </h1>
+      </div>
+    </div>
+  </section>
+  <div class="block" id="errs"></div>
+  <div class="block p-4">
+    <form id="taskForm" data-formtype="{{.FormType}}">
+    <input type="hidden" id="taskId" value="{{if eq .FormType "new"}}{{.FormType}}{{else}}{{.Task.ID}}{{end}}">
+      <div class="field">
+        <label class="label">Title</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="Title" {{if eq .FormType "edit"}}value="{{.Task.Title}}"{{end}} name="title" required />
+        </div>
+        <p class="help">Task Title</p>
+      </div>
+      <div class="field">
+        <label class="label">Details</label>
+        <div class="control">
+          <textarea class="textarea" placeholder="Details..." name="details" >{{if eq .FormType "edit"}}{{.Task.Details}}{{end}}</textarea>
+        </div>
+        <p class="help">Details of the task</p>
+      </div>
+      {{if eq .FormType "edit"}}
+      <div class="field">
+        <label class="label">Task Status</label>
+        <div class="control">
+          <div class="select">
+            {{template "selectStatus" .}}
+          </div>
+        </div>
+      </div>
+      {{end}}
+      <div class="control">
+        <button class="button is-primary">Save</button>
+      </div>
+    </form>
+  </div>
+  <div class="block p-4">
+    <a href="/" class="button is-info is-outlined is-small">Cancel</a>
+  </div>
+</div>
+  <script src="/static/js/taskForm.js"></script>
+{{end}}
+
+{{define "selectStatus"}}
+<select name="status">
+{{with $t := .Task }}
+  {{range $i , $v := $t.AllowedStatuses}}
+  <option value="{{$v}}" {{if eq $t.Status $v}}selected{{end}}>{{$v}}</option>
+  {{end}}
+{{end}}
+</select>
+{{end}}

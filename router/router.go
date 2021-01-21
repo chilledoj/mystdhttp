@@ -5,48 +5,24 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(lg *log.Logger, initTasks bool) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", taskListPage())
+	th := NewTasksHandler(lg, initTasks)
+	mux.HandleFunc("/", th.taskListPage())
+	mux.HandleFunc("/new", th.taskCreatePage())
+	mux.Handle("/view/", http.StripPrefix("/view", http.HandlerFunc(th.taskViewPage())))
+	mux.Handle("/edit/", http.StripPrefix("/edit", http.HandlerFunc(th.taskEditPage())))
 
-	return mux
-}
+	mux.Handle("/api/tasks/", http.StripPrefix("/api/tasks", th))
+	mux.HandleFunc("/api/comments", th.addComment)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 
-var tasks = []map[string]string{
-	{"id": "task-01", "title": "test", "details": "a test task", "status": "active"},
-	{"id": "task-02", "title": "Another Test", "details": "# Title\n\n+ Some Stuff to do\n+ Another item\n\nSomething else written here", "status": "active"},
-	{"id": "task-03", "title": "Test 3", "details": "a test task 3", "status": "active"},
-	{"id": "task-04", "title": "Test 4", "details": "a test task 4", "status": "active"},
-	{"id": "task-05", "title": "Test 5", "details": "a test task 5", "status": "active"},
-	{"id": "task-06", "title": "Test 6", "details": "a test task 6", "status": "pending"},
-	{"id": "task-07", "title": "Test 7", "details": "a test task 7", "status": "pending"},
-	{"id": "task-08", "title": "Test 8", "details": "a test task 8", "status": "active"},
-	{"id": "task-09", "title": "Test 9", "details": "a test task 9", "status": "inactive"},
-	{"id": "task-10", "title": "Test 10", "details": "a test task 10", "status": "inactive"},
-}
-
-func taskListPage() http.HandlerFunc {
-	files := tmplLayout("./web/templates/index.gohtml")
-	tmpl := template.Must(template.New("index").Funcs(defaultFuncs).ParseFiles(files...))
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" || r.Method != http.MethodGet {
-			notFoundPage(w, r)
-			return
-		}
-		var buf bytes.Buffer
-		if err := tmpl.ExecuteTemplate(&buf, "base", map[string]interface{}{
-			"Tasks": tasks,
-		}); err != nil {
-			fmt.Printf("ERR: %v\n", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		w.WriteHeader(http.StatusOK)
-		io.Copy(w, &buf)
-	}
+	return logMiddleware(lg, recoverMiddleware(lg, mux))
 }
 
 var notFoundPage = func() http.HandlerFunc {
@@ -58,6 +34,7 @@ var notFoundPage = func() http.HandlerFunc {
 		if err := tmpl.ExecuteTemplate(&buf, "base", nil); err != nil {
 			fmt.Printf("ERR: %v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusOK)
 		io.Copy(w, &buf)

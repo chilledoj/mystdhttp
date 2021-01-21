@@ -1,0 +1,105 @@
+{{define "content"}}
+<div class="container">
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Tasks / {{.Task.ID}}
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <div class="block px-4 py-1">
+  <nav class="breadcrumb" aria-label="breadcrumb" >
+    <ul>
+    <li><a href="/">Tasks</a></li>
+    <li class="is-active"><a href="#" aria-current="page">{{.Task.ID}}</a></li>
+  </nav>
+  </div>
+
+
+  <div class="block px-4" >
+  <div class="box">
+    <div class="block is-flex is-justify-content-space-between">
+      <h2 class="title">{{.Task.Title}}</h2>
+      {{template "statusTag" .Task.Status}}
+    </div>
+    <div class="block is-flex is-justify-content-flex-end">
+      <a href="/edit/{{.Task.ID}}" class="button is-dark">
+          <span class="icon"><i class="gg-pen"></i></span>
+          <span class="ml-2"> Edit</span>
+      </a>
+    </div>
+    <div class="block p-4">
+      <div class="level">
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Creator</p>
+            <p class="title">{{.Task.Creator}}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Create Date</p>
+            <p class="subtitle">{{dtestr .Task.CreatedAt "2006-01-02 15:04"}}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Assigned To</p>
+            <p class="title">{{.Task.AssignedTo}}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">      
+          <div>
+            <p class="heading">Update Date</p>
+            <p class="subtitle">{{dtestr .Task.UpdatedAt "2006-01-02 15:04"}}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Updater</p>
+            <p class="title">{{.Task.Updater}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="block p-4">
+      <h3 class="heading is-size-4">Details</h3>
+      <div class="block mt-4 p-4 has-background-white-ter" id="taskDetails">{{.Task.Details}}</div>
+    </div>
+    <div class="block p-4">
+      <h3 class="heading is-size-4">Comments</h3>
+      {{if eq (len .Task.Comments) 0 }}<div class="box"><p class="heading">no comments</p></div>{{end}}
+      {{range $i, $c := .Task.Comments}}
+        <div class="box">
+        <article class="media">
+          {{/* <figure class="media-left">
+            <p class="image is-64x64">{{$c.Username}}</p>
+          </figure> */}}
+          <div class="media-content">
+            <div class="content">
+            <p><strong>{{$c.Username}}</strong>  <small>{{dtestr $c.Tsp "Jan 2 2006 15:04"}}</small>
+            <br />
+            {{$c.Body}}
+            </p>
+            </div>
+          </div>
+        </article>
+        </div>
+      {{end}}
+      <div class="box">
+        <form id="commentForm" data-task-id="{{.Task.ID}}">
+          <div class="field">
+            <label class="label">New Comment</label>
+            <div class="control"><textarea class="textarea" name="cmtBody" placeholder="comment..."></textarea></div>
+          </div>
+          <button class="button is-primary" type="submit">Add Comment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/js/taskView.js"></script>
+{{end}}
