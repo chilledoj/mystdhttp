@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 )
 
-func NewRouter(initTasks bool) http.Handler {
+func NewRouter(lg *log.Logger, initTasks bool) http.Handler {
 	mux := http.NewServeMux()
 
-	th := NewTasksHandler(initTasks)
+	th := NewTasksHandler(lg, initTasks)
 	mux.HandleFunc("/", th.taskListPage())
 	mux.HandleFunc("/new", th.taskCreatePage())
 	mux.Handle("/view/", http.StripPrefix("/view", http.HandlerFunc(th.taskViewPage())))
@@ -21,7 +22,7 @@ func NewRouter(initTasks bool) http.Handler {
 	mux.HandleFunc("/api/comments", th.addComment)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 
-	return logMiddleware(recoverMiddleware(mux))
+	return logMiddleware(lg, recoverMiddleware(lg, mux))
 }
 
 var notFoundPage = func() http.HandlerFunc {

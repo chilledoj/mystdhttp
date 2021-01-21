@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net"
+	"os"
 )
 
 func main() {
@@ -14,9 +15,12 @@ func main() {
 	)
 	flag.Parse()
 
+	lg := log.New(os.Stdout, "[stask] ", log.LstdFlags)
+
 	addr := net.JoinHostPort(*host, *port)
 
 	if err := runHttp(options{
+		lg:         lg,
 		listenAddr: addr,
 		initTasks:  *initTasks,
 	}); err != nil {

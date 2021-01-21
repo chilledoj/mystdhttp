@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -9,6 +9,7 @@ import (
 )
 
 type options struct {
+	lg         *log.Logger
 	listenAddr string
 	initTasks  bool
 }
@@ -16,12 +17,12 @@ type options struct {
 func runHttp(opts options) error {
 	s := http.Server{
 		Addr:           opts.listenAddr,
-		Handler:        router.NewRouter(opts.initTasks),
+		Handler:        router.NewRouter(opts.lg, opts.initTasks),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	fmt.Printf("Starting HTTP listener at %s\n", opts.listenAddr)
+	opts.lg.Printf("Starting HTTP listener at %s\n", opts.listenAddr)
 	return s.ListenAndServe()
 }

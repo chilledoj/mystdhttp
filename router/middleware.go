@@ -2,19 +2,20 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
 
-func logMiddleware(handler http.Handler) http.Handler {
+func logMiddleware(lg *log.Logger, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nw := time.Now()
 		handler.ServeHTTP(w, r)
-		fmt.Printf("%s %s %s %s\n", r.RemoteAddr, r.Method, r.URL, time.Since(nw))
+		lg.Printf("%s %s %s %s\n", r.RemoteAddr, r.Method, r.URL, time.Since(nw))
 	})
 }
 
-func recoverMiddleware(handler http.Handler) http.Handler {
+func recoverMiddleware(lg *log.Logger, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {

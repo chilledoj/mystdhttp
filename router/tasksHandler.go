@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -14,6 +15,7 @@ import (
 
 // TasksHandler doubles as both an http service and a db
 type TasksHandler struct {
+	lg *log.Logger
 	mu sync.RWMutex
 	// data map indexes each task by it's ID
 	data map[string]Task
@@ -45,8 +47,9 @@ Task %d details
 	}
 }
 
-func NewTasksHandler(initTasks bool) *TasksHandler {
+func NewTasksHandler(lg *log.Logger, initTasks bool) *TasksHandler {
 	th := &TasksHandler{
+		lg:   lg,
 		data: make(map[string]Task),
 	}
 	if initTasks {
